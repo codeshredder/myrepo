@@ -1,0 +1,1 @@
+http://asuswrt.eu/files/entware.arm/entware.arm-setup.sh
