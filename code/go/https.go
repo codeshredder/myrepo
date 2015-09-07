@@ -7,7 +7,7 @@ import (
     "log"
 )
 
-var listenAddr = "192.168.0.102"
+var listenAddr = "192.168.0.100"
 
 func sayhello(w http.ResponseWriter, r *http.Request) {
     r.ParseForm()
@@ -36,15 +36,15 @@ func main() {
     http.HandleFunc("/", sayhello)
 
     go func() {
-        err := http.ListenAndServeTLS(listenAddr+":443", "ca-cert.pem", "ca-key.pem", nil)
-        if  err != nil {
-            log.Fatal("ListenAndServeTLS: ", err)
+        err := http.ListenAndServe(listenAddr+":80", http.HandlerFunc(redir)); 
+        if err != nil {
+            log.Fatal("ListenAndServe: ", err)
         }
     }()
 
-    err := http.ListenAndServe(listenAddr+":80", http.HandlerFunc(redir)); 
-    if err != nil {
-        log.Fatal("ListenAndServe: ", err)
+    err := http.ListenAndServeTLS(listenAddr+":443", "ca-cert.pem", "ca-key.pem", nil)
+    if  err != nil {
+        log.Fatal("ListenAndServeTLS: ", err)
     }
 
 }
