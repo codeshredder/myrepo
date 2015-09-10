@@ -29,22 +29,21 @@ type Configuration struct {
 var Cfg Configuration
 
 func LoadConfig () {
-	fmt.Printf("LoadConfig\n");
-	file, err := os.OpenFile("config/config.json",  os.O_RDWR, 0666)
+    fmt.Printf("LoadConfig\n");
+    file, err := os.OpenFile("config/config.json",  os.O_RDWR, 0666)
     if err != nil {
         fmt.Printf("open failed!\n")
         return
     }
-	dec := json.NewDecoder(file)
-	for {
-		if err := dec.Decode(&Cfg); err == io.EOF {
-			break
-		} else if err != nil {
-			log.Fatal(err)
-		}
-
-//		fmt.Printf("%s, %s\n", Cfg.Run_mode, Cfg.App_name)
+    defer file.Close()
+    
+    dec := json.NewDecoder(file)
+    for {
+	if err := dec.Decode(&Cfg); err == io.EOF {
+	    break
+	} else if err != nil {
+            log.Fatal(err)
 	}
-
-	file.Close()
+//	fmt.Printf("%s, %s\n", Cfg.Run_mode, Cfg.App_name)
+    }
 }
