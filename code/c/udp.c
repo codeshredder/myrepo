@@ -19,11 +19,30 @@
 
 void *recv_task(void *arg)
 {
-	int sockfd = *(int *)arg;
+	int sockfd;
 	struct sockaddr_in addr;
 	int addrlen = sizeof(addr);
 	char buffer[BUFLEN];
 	int buffer_len = 0;
+
+	if ((sockfd = socket(AF_INET, SOCK_DGRAM, 0)) < 0)
+	{
+        printf("create socket error: %s(errno: %d)\n", strerror(errno), errno);
+        return;
+	}
+	
+	memset((char *) &addr, 0, sizeof(addr));
+	addr.sin_family = AF_INET;
+	addr.sin_port = htons(PORT);              // listen port
+	addr.sin_addr.s_addr = htonl(INADDR_ANY);
+
+	//bind socket to port
+	if( bind(sockfd , (struct sockaddr*)&addr, sizeof(addr) ) == -1)
+	{
+        printf("bind error: %s(errno: %d)\n", strerror(errno), errno);
+  		close(sockfd);
+        return;
+    }
 
 	while(1) {
 		memset(buffer, 0, BUFLEN);
@@ -54,26 +73,7 @@ int main(int argc, char**argv)
 
 	    pthread_t task_thread;
 
-		if ((sockfd = socket(AF_INET, SOCK_DGRAM, 0)) < 0)
-		{
-	        printf("create socket error: %s(errno: %d)\n", strerror(errno), errno);
-	        return -1;
-		}
-		
-		memset((char *) &addr, 0, sizeof(addr));
-		addr.sin_family = AF_INET;
-		addr.sin_port = htons(PORT);              // listen port
-		addr.sin_addr.s_addr = htonl(INADDR_ANY);
-		
-		//bind socket to port
-		if( bind(sockfd , (struct sockaddr*)&addr, sizeof(addr) ) == -1)
-		{
-	        printf("bind error: %s(errno: %d)\n", strerror(errno), errno);
-      		close(sockfd);
-	        return -1;
-	    }
-
-	    if (pthread_create(&task_thread, NULL, recv_task, &sockfd) < 0)
+	    if (pthread_create(&task_thread, NULL, recv_task, NULL) < 0)
 	    {
 	        printf("pthread_create failed!\r\n");
       		close(sockfd);
