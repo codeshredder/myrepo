@@ -59,11 +59,6 @@ void *recv_task(void *arg)
 
 int main(int argc, char**argv)
 {
-	int sockfd;
-	struct sockaddr_in addr;
-	int addrlen = sizeof(addr);
-	char buffer[BUFLEN];
-	int buffer_len = 0;
 
     if (argc < 2) {
 		return 0;
@@ -76,15 +71,18 @@ int main(int argc, char**argv)
 	    if (pthread_create(&task_thread, NULL, recv_task, NULL) < 0)
 	    {
 	        printf("pthread_create failed!\r\n");
-      		close(sockfd);
 	        return -1;
 	    }
 
 	    pthread_join(task_thread, NULL);
-
-	    close(sockfd);
 	}
 	else if (0 == strcmp(argv[1],"client")) {
+
+    	int sockfd;
+    	struct sockaddr_in addr;
+    	int addrlen = sizeof(addr);
+    	char buffer[BUFLEN];
+    	int buffer_len = 0;
 
 		if ((sockfd = socket(AF_INET, SOCK_DGRAM, 0)) < 0)
 		{
